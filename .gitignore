@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+.vite/
+*.local
+
+# ML model caches / weights (downloaded at runtime, not committed)
+*.pt
+*.pth
+*.onnx
+models/
+.cache/
+
+# Uploaded / generated audio & artifacts (keep the repo clean of user media)
+uploads/
+outputs/
+*.wav
+*.mp3
+*.flac
+*.gp5
+*.musicxml
+# ...but allow intentionally-committed royalty-free samples
+!samples/**
+
+# Env / secrets
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

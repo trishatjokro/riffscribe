@@ -1,0 +1,54 @@
+[project]
+name = "riffscribe"
+version = "0.0.1"
+description = "Automatic electric-guitar tablature from audio."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Trisha Tjokrosapoetro" }]
+
+dependencies = [
+    # web API
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "python-multipart>=0.0.9",   # file uploads
+
+    # audio / DSP
+    "librosa>=0.10",
+    "soundfile>=0.12",
+    "numpy>=1.24",
+
+    # transcription (audio -> MIDI)
+    "basic-pitch>=0.3",
+
+    # symbolic music + tab export
+    "music21>=9.1",
+    "PyGuitarPro>=0.9",
+    "pretty_midi>=0.2.10",
+]
+
+[project.optional-dependencies]
+# heavier / optional pipeline pieces, installed on demand
+separation = ["demucs>=4.0"]      # full-mix guitar stem (P2)
+mono = ["crepe>=0.0.15"]          # cleaner monophonic pitch tracking
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+    "mypy>=1.9",
+    "httpx>=0.27",                # test client for FastAPI
+]
+
+[project.scripts]
+riffscribe = "app.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]   # import `app` without an editable install (keeps CI light)

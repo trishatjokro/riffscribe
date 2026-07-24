@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      # Install only the light deps needed for the deterministic tests, so CI
+      # stays fast and green before the heavy ML stages land.
+      - run: pip install pytest ruff
+      - run: ruff check app tests
+      - run: pytest tests/test_tab.py -q
