@@ -66,9 +66,10 @@ def _run_pipeline(job_id: str, audio_path: Path) -> None:
     job = _JOBS[job_id]
     job.status = JobStatus.processing
     try:
-        events = transcribe(audio_path)          # audio -> notes  (P0: not yet impl)
-        tab = assign_tab(events)                  # notes -> string/fret (implemented)
+        events = transcribe(audio_path)          # audio -> notes (Basic Pitch)
+        tab = assign_tab(events)                  # notes -> string/fret (DP optimizer)
         job.ascii_tab = to_ascii(tab)
+        job.tab = _serialize_tab(tab)
         job.meta = {"tempo_bpm": tab.tempo_bpm, "num_notes": len(tab.notes)}
         job.status = JobStatus.done
     except NotImplementedError as exc:
