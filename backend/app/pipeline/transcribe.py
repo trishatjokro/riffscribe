@@ -82,6 +82,21 @@ def _transcribe_basic_pitch(audio_path: Path) -> NoteEvents:
     )
 
 
+def _model_path(default):
+    """Prefer the ONNX serialization of the Basic Pitch model when present.
+
+    The library's default points at a TensorFlow SavedModel, whose loader is
+    heavy and flaky across platforms/Python versions. We install the ``[onnx]``
+    runtime, so use the equivalent ``.onnx`` weights if they're on disk and fall
+    back to the default otherwise.
+    """
+    from pathlib import Path
+
+    base = Path(str(default))
+    onnx = base.with_name(base.name + ".onnx")
+    return str(onnx if onnx.exists() else base)
+
+
 def to_monophonic(notes: list[Note], overlap_eps: float = _OVERLAP_EPS) -> list[Note]:
     """Reduce a (time-sorted) note list to a single non-overlapping line.
 
