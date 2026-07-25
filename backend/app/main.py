@@ -107,6 +107,12 @@ def _run_pipeline(job_id: str, audio_path: Path) -> None:
         job.error = str(exc)
 
 
+@app.get("/")
+def index() -> FileResponse:
+    """Serve the riffscribe web UI (single self-contained page)."""
+    return FileResponse(_STATIC / "index.html")
+
+
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok", "version": __version__}
