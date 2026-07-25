@@ -47,6 +47,7 @@ def transcribe(audio_path: Path | str, backend: str = "basic_pitch") -> NoteEven
 
 def _transcribe_basic_pitch(audio_path: Path) -> NoteEvents:
     """Run Basic Pitch and reduce its polyphonic output to a monophonic line."""
+    _ensure_scipy_compat()
     # Imported lazily: pulls in the (heavy) ML runtime only when actually used,
     # so the rest of the package stays importable without it (tests, tab stage).
     from basic_pitch import ICASSP_2022_MODEL_PATH
