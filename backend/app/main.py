@@ -15,10 +15,13 @@ from tempfile import gettempdir
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from . import __version__
 
 app = FastAPI(title="riffscribe", version=__version__)
+
+_STATIC = Path(__file__).parent / "static"
 
 # Dev CORS: the Vite frontend runs on a different port.
 app.add_middleware(
