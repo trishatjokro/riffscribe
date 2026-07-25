@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>riffscribe</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎸</text></svg>">
+</head>
+<body>
+<style>
+  :root{
+    /* light theme (base) */
+    --bg:#F6F1E7; --surface:#FFFFFF; --surface-2:#EFE8DA;
+    --text:#211C14; --muted:#6E6656; --border:#E3DBCB;
+    --accent:#B4651F; --accent-glow:#D8842B; --accent-2:#347368;
+    --good:#3F8F5B; --warn:#B67B22; --bad:#B4472F;
+    --string:#C4BBA8; --shadow:0 1px 2px rgba(30,22,10,.06),0 8px 24px rgba(30,22,10,.06);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#16130E; --surface:#201B14; --surface-2:#2A241B;
+      --text:#F1EADC; --muted:#A89C85; --border:#33291E;
+      --accent:#F0A339; --accent-glow:#FFB347; --accent-2:#6FB3A8;
+      --good:#5FB27C; --warn:#E8A33D; --bad:#E1725A;
+      --string:#57503F; --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#F6F1E7; --surface:#FFFFFF; --surface-2:#EFE8DA;
+    --text:#211C14; --muted:#6E6656; --border:#E3DBCB;
+    --accent:#B4651F; --accent-glow:#D8842B; --accent-2:#347368;
+    --good:#3F8F5B; --warn:#B67B22; --bad:#B4472F;
+    --string:#C4BBA8; --shadow:0 1px 2px rgba(30,22,10,.06),0 8px 24px rgba(30,22,10,.06);
+  }
+  :root[data-theme="dark"]{
+    --bg:#16130E; --surface:#201B14; --surface-2:#2A241B;
+    --text:#F1EADC; --muted:#A89C85; --border:#33291E;
+    --accent:#F0A339; --accent-glow:#FFB347; --accent-2:#6FB3A8;
+    --good:#5FB27C; --warn:#E8A33D; --bad:#E1725A;
+    --string:#57503F; --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0}
+  .app{
+    font-family:var(--font); background:var(--bg); color:var(--text);
+    min-height:100vh; line-height:1.5;
+    padding:clamp(16px,4vw,40px) clamp(14px,4vw,24px) 64px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto}
+
+  /* ---- header ---- */
+  header.hd{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:28px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .mark{
+    width:40px;height:40px;border-radius:10px;flex:none;
+    background:radial-gradient(120% 120% at 30% 20%,var(--accent-glow),var(--accent) 55%,#7a3f12 130%);
+    box-shadow:0 0 0 1px rgba(0,0,0,.15) inset,0 6px 18px -6px var(--accent);
+    display:grid;place-items:center;color:#1a1206;font-size:20px;
+  }
+  h1{font-size:clamp(1.5rem,4vw,2rem);margin:0;letter-spacing:-.02em;font-weight:750}
+  h1 b{color:var(--accent)}
+  .tag{color:var(--muted);font-size:.86rem;margin:2px 0 0}
+  .themebtn{
+    font:inherit;font-size:.8rem;color:var(--muted);background:var(--surface);
+    border:1px solid var(--border);border-radius:999px;padding:7px 13px;cursor:pointer;
+    display:inline-flex;gap:7px;align-items:center;transition:color .15s,border-color .15s;
+  }
+  .themebtn:hover{color:var(--text);border-color:var(--accent)}
+
+  /* ---- cards ---- */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+  .setup{padding:18px;margin-bottom:18px;display:flex;flex-direction:column;gap:18px}
+
+  .row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end}
+  .field{display:flex;flex-direction:column;gap:6px}
+  label.lab{font-size:.7rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:650}
+  select,textarea,input[type=text]{
+    font:inherit;color:var(--text);background:var(--surface-2);
+    border:1px solid var(--border);border-radius:10px;padding:9px 11px;
+  }
+  select{cursor:pointer;min-width:170px}
+  .capo{display:inline-flex;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .capo button{font:inherit;font-size:1.1rem;line-height:1;width:38px;height:38px;background:none;border:none;color:var(--text);cursor:pointer}
+  .capo button:hover{background:var(--border)}
+  .capo span{min-width:56px;text-align:center;font-variant-numeric:tabular-nums;font-size:.9rem}
+
+  /* segmented control */
+  .seg{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:4px;flex-wrap:wrap}
+  .seg button{
+    font:inherit;font-size:.85rem;font-weight:600;color:var(--muted);
+    background:none;border:none;border-radius:9px;padding:8px 14px;cursor:pointer;transition:all .15s;
+  }
+  .seg button[aria-selected=true]{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .seg button:hover{color:var(--text)}
+
+  .panel{display:none}
+  .panel.on{display:block}
+
+  .riffs{display:flex;gap:10px;flex-wrap:wrap}
+  .riff{
+    font:inherit;text-align:left;cursor:pointer;color:var(--text);
+    background:var(--surface-2);border:1px solid var(--border);border-radius:11px;
+    padding:11px 13px;display:flex;flex-direction:column;gap:2px;min-width:150px;transition:border-color .15s,transform .05s;
+  }
+  .riff:hover{border-color:var(--accent)}
+  .riff:active{transform:translateY(1px)}
+  .riff b{font-size:.9rem;font-weight:650}
+  .riff small{color:var(--muted);font-size:.74rem}
+
+  textarea{width:100%;min-height:74px;resize:vertical;font-family:var(--mono);font-size:.9rem}
+  .hint{color:var(--muted);font-size:.78rem;margin:8px 0 0}
+  .err{color:var(--bad);font-size:.82rem;margin:8px 0 0;min-height:1em}
+
+  .btn{
+    font:inherit;font-weight:650;cursor:pointer;border-radius:10px;padding:10px 18px;border:1px solid transparent;
+    background:var(--accent);color:#1a1206;transition:filter .15s,transform .05s;
+  }
+  .btn:hover{filter:brightness(1.06)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:var(--surface-2);color:var(--text);border-color:var(--border)}
+
+  .drop{
+    border:1.5px dashed var(--border);border-radius:12px;padding:26px;text-align:center;color:var(--muted);
+    background:var(--surface-2);cursor:pointer;transition:border-color .15s}
+  .drop:hover{border-color:var(--accent-2)}
+  .drop strong{color:var(--text);display:block;margin-bottom:4px}
+  .notice{
+    display:flex;gap:11px;margin-top:14px;padding:13px 15px;border-radius:11px;
+    background:color-mix(in srgb,var(--accent-2) 12%,transparent);
+    border:1px solid color-mix(in srgb,var(--accent-2) 40%,transparent);font-size:.85rem}
+  .notice .ic{color:var(--accent-2);flex:none;font-size:1.05rem;line-height:1.3}
+  .notice code{font-family:var(--mono);font-size:.82em;background:var(--surface);padding:1px 5px;border-radius:5px;border:1px solid var(--border)}
+
+  /* ---- viewer ---- */
+  .viewer{padding:0;overflow:hidden}
+  .transport{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface-2)}
+  .play{
+    width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;flex:none;
+    background:var(--accent);color:#1a1206;font-size:18px;display:grid;place-items:center;
+    box-shadow:0 4px 14px -4px var(--accent);transition:filter .15s,transform .05s}
+  .play:hover{filter:brightness(1.06)} .play:active{transform:scale(.95)}
+  .play:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+  .tbtn{font:inherit;font-size:.82rem;color:var(--muted);background:none;border:1px solid var(--border);border-radius:8px;padding:7px 11px;cursor:pointer}
+  .tbtn[aria-pressed=true]{color:var(--accent);border-color:var(--accent)}
+  .tbtn:disabled{opacity:.4;cursor:not-allowed}
+  .speed{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted)}
+  .speed input{accent-color:var(--accent)}
+  .speed b{color:var(--text);font-variant-numeric:tabular-nums;min-width:2.4em;display:inline-block}
+  .chip{margin-left:auto;font-size:.72rem;display:inline-flex;align-items:center;gap:6px;color:var(--muted);
+    background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 10px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good)}
+
+  .stage{padding:18px 16px 20px}
+  .stagehd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+  .stagehd h2{font-size:.95rem;margin:0;font-weight:650}
+  .stagehd small{color:var(--muted);font-size:.78rem}
+
+  /* tab grid */
+  .tabscroll{overflow-x:auto;padding-bottom:6px}
+  .tab{display:inline-flex;flex-direction:column;gap:0;font-family:var(--mono);font-size:.95rem;min-width:100%}
+  .tabline{display:flex;align-items:center;white-space:nowrap}
+  .tabline .lbl{width:2.2ch;color:var(--muted);flex:none;text-align:right;padding-right:6px;font-weight:600}
+  .tabline .track{display:flex;position:relative}
+  .cell{width:2.6ch;text-align:center;color:var(--muted);position:relative;padding:2px 0}
+  .cell.fret{color:var(--text);font-weight:600}
+  .col-active .cell{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+  .col-active .cell.fret{color:var(--accent);background:color-mix(in srgb,var(--accent) 22%,transparent)}
+
+  /* fretboard */
+  .fb-wrap{margin-top:18px}
+  canvas#fb{width:100%;height:168px;display:block;border-radius:12px;background:var(--surface-2);border:1px solid var(--border)}
+
+  .empty{color:var(--muted);text-align:center;padding:38px 12px;font-size:.9rem}
+
+  footer{margin-top:26px;color:var(--muted);font-size:.8rem;line-height:1.6}
+  footer .real{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px}
+  footer .real span{display:inline-flex;gap:7px;align-items:center}
+  .pill{font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;padding:2px 7px;border-radius:5px}
+  .pill.live{color:var(--good);background:color-mix(in srgb,var(--good) 15%,transparent)}
+  .pill.soon{color:var(--warn);background:color-mix(in srgb,var(--warn) 15%,transparent)}
+  a{color:var(--accent)}
+
+  @media (max-width:560px){
+    select{min-width:0;width:100%}
+    .field{flex:1 1 100%}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+  }
+</style>
+
+<div class="app">
+  <div class="wrap">
+    <header class="hd">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">🎸</div>
+        <div>
+          <h1>riff<b>scribe</b></h1>
+          <p class="tag">Turn a guitar line into a tab you can see, hear, and edit.</p>
+        </div>
+      </div>
+      <button class="themebtn" id="theme" type="button"><span id="themeIcon">◐</span> Theme</button>
+    </header>
+
+    <!-- SETUP -->
+    <section class="card setup">
+      <div class="row">
+        <div class="field">
+          <label class="lab" for="tuning">Tuning</label>
+          <select id="tuning">
+            <option value="standard">Standard — E A D G B e</option>
+            <option value="dropd">Drop D — D A D G B e</option>
+            <option value="eb">Half-step down — E♭ A♭ D♭ G♭ B♭ e♭</option>
+            <option value="dadgad">DADGAD — D A D G A D</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lab">Capo</label>
+          <div class="capo">
+            <button type="button" id="capoDown" aria-label="Capo down">−</button>
+            <span id="capoVal">No capo</span>
+            <button type="button" id="capoUp" aria-label="Capo up">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="seg" role="tablist" aria-label="Input method">
+        <button role="tab" aria-selected="true"  data-tab="riffs">Demo riffs</button>
+        <button role="tab" aria-selected="false" data-tab="notes">Type notes</button>
+        <button role="tab" aria-selected="false" data-tab="upload">Upload audio</button>
+        <button role="tab" aria-selected="false" data-tab="song">Song name</button>
+      </div>
+
+      <div class="panel on" data-panel="riffs">
+        <div class="riffs" id="riffList"></div>
+      </div>
+
+      <div class="panel" data-panel="notes">
+        <label class="lab" for="noteInput" style="margin-bottom:6px;display:block">Notes (name + octave, space-separated)</label>
+        <textarea id="noteInput" spellcheck="false" placeholder="E2 G2 A2 B2 D3 E3 D3 B2">E3 G3 A3 B3 D4 B3 A3 G3</textarea>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+          <button class="btn" id="genNotes" type="button">Generate tab</button>
+          <span class="hint" style="margin:0">e.g. <code style="font-family:var(--mono)">A2 A#2 B2 C3</code> · sharps <code>#</code>, flats <code>b</code></span>
+        </div>
+        <div class="err" id="noteErr"></div>
+      </div>
+
+      <div class="panel" data-panel="upload">
+        <div class="drop" id="drop">
+          <strong>Drop an audio file, or click to choose</strong>
+          mp3 · wav · a clean, mostly-solo guitar clip works best
+        </div>
+        <input type="file" id="file" accept="audio/*" hidden>
+        <div class="notice">
+          <span class="ic" aria-hidden="true">▲</span>
+          <div id="uploadMsg">Drop a clean, mostly-solo guitar clip and riffscribe transcribes it to a tab you can play back below. The first run downloads the model, so give it a moment. Distorted riffs and full mixes will be rough — that's expected.</div>
+        </div>
+      </div>
+
+      <div class="panel" data-panel="song">
+        <div class="field" style="width:100%">
+          <label class="lab" for="songInput">Song title</label>
+          <input type="text" id="songInput" placeholder="e.g. Smoke on the Water">
+        </div>
+        <div class="notice">
+          <span class="ic" aria-hidden="true">▲</span>
+          <div>Searching by title is a catalog/licensing feature — the big tab libraries are human-made, so this path resolves a title to audio you provide, then runs the same engine. Not enabled in this demo. <b>Upload or type notes to try the engine now.</b></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEWER -->
+    <section class="card viewer">
+      <div class="transport">
+        <button class="play" id="play" type="button" aria-label="Play" disabled>▶</button>
+        <div class="speed">
+          <label class="lab" for="speed" style="letter-spacing:.06em">Speed</label>
+          <input type="range" id="speed" min="0.5" max="1.5" step="0.1" value="1">
+          <b id="speedVal">1.0×</b>
+        </div>
+        <button class="tbtn" id="loop" type="button" aria-pressed="false">↻ Loop</button>
+        <span class="chip"><span class="dot"></span> engine: live · client-side</span>
+      </div>
+      <div class="stage">
+        <div class="stagehd">
+          <h2 id="stageTitle">Tablature</h2>
+          <small id="stageMeta">pick a riff to begin</small>
+        </div>
+        <div id="tabHost">
+          <div class="empty" id="empty">🎵 Choose a demo riff or type notes — riffscribe assigns the easiest fingering, then plays it back.</div>
+          <div class="tabscroll" id="tabScroll" hidden><div class="tab" id="tab"></div></div>
+        </div>
+        <div class="fb-wrap">
+          <canvas id="fb" width="900" height="168" aria-label="Fretboard diagram"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>riffscribe — an electric-first, open-source automatic tab generator. This page runs the <b>real</b> fret-assignment engine (a dynamic-programming optimizer) and synthesizes playback with the Web Audio API.</div>
+      <div class="real">
+        <span><span class="pill live">Live</span> audio-file transcription · notes → tab · fingering · playback · tunings &amp; capo</span>
+        <span><span class="pill soon">Roadmap</span> song search · chords / polyphony · full-mix separation</span>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- theme ----------
+  var root=document.documentElement;
+  document.getElementById("theme").addEventListener("click",function(){
+    var isDark=(root.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"))==="dark";
+    root.setAttribute("data-theme",isDark?"light":"dark");
+    draw(activeIdx);
+  });
+
+  // ---------- music helpers ----------
+  var SEMI={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+  function noteToMidi(tok){
+    var m=String(tok).trim().match(/^([A-Ga-g])([#b]?)(-?\d+)$/);
+    if(!m) return null;
+    var s=SEMI[m[1].toUpperCase()];
+    if(m[2]==="#") s+=1; else if(m[2]==="b") s-=1;
+    return 12*(parseInt(m[3],10)+1)+s;
+  }
+  var NAMES=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+  function midiName(m){return NAMES[((m%12)+12)%12]+(Math.floor(m/12)-1);}
+
+  var TUNINGS={
+    standard:{open:[40,45,50,55,59,64],lbl:["E","A","D","G","B","e"]},
+    dropd:{open:[38,45,50,55,59,64],lbl:["D","A","D","G","B","e"]},
+    eb:{open:[39,44,49,54,58,63],lbl:["E♭","A♭","D♭","G♭","B♭","e♭"]},
+    dadgad:{open:[38,45,50,55,57,62],lbl:["D","A","D","G","A","D"]}
+  };
+  var MAX_FRET=22, W_FRET=0.4, W_MOVE=1.0, W_OPEN=0.3;
+
+  // ---------- DP fret optimizer (port of backend tab.py) ----------
+  function candidates(pitch,open,capo){
+    var out=[];
+    for(var i=0;i<open.length;i++){
+      var fret=pitch-open[i]-capo;
+      if(fret>=0&&fret<=MAX_FRET) out.push([i,fret]);
+    }
+    return out;
+  }
+  function posCost(fret){ return W_FRET*fret - (fret===0?W_OPEN:0); }
+  function transCost(prev,cur){
+    if(prev[1]===0||cur[1]===0) return 0;
+    return W_MOVE*Math.abs(prev[1]-cur[1]);
+  }
+  function assignTab(notes,tuning,capo){
+    var open=TUNINGS[tuning].open;
+    // filter playable, keep timing
+    var play=[],dropped=0;
+    notes.forEach(function(n){
+      if(candidates(n.pitch,open,capo).length) play.push(n); else dropped++;
+    });
+    if(!play.length) return {notes:[],dropped:dropped};
+    var cands=play.map(function(n){return candidates(n.pitch,open,capo);});
+    var dp=[],back=[];
+    for(var i=0;i<cands.length;i++){
+      var di={},bi={};
+      cands[i].forEach(function(pos){
+        var stat=posCost(pos[1]);
+        if(i===0){di[pos]=stat;bi[pos]=null;}
+        else{
+          var bestC=Infinity,bestP=null;
+          for(var k in dp[i-1]){
+            var pp=k.split(",").map(Number);
+            var c=dp[i-1][k]+transCost(pp,pos)+stat;
+            if(c<bestC){bestC=c;bestP=k;}
+          }
+          di[pos]=bestC;bi[pos]=bestP;
+        }
+      });
+      dp.push(di);back.push(bi);
+    }
+    // backtrack from cheapest final
+    var last=dp.length-1, bestK=null,bestV=Infinity;
+    for(var k in dp[last]){ if(dp[last][k]<bestV){bestV=dp[last][k];bestK=k;} }
+    var chosen=[],idx=last,key=bestK;
+    while(idx>=0&&key!=null){ chosen.push(key.split(",").map(Number)); key=back[idx][key]; idx--; }
+    chosen.reverse();
+    var res=chosen.map(function(p,j){
+      return {string:p[0],fret:p[1],start:play[j].start,dur:play[j].dur,pitch:play[j].pitch};
+    });
+    return {notes:res,dropped:dropped};
+  }
+
+  // ---------- state ----------
+  var current=null;        // {notes:[...], dropped}
+  var activeIdx=-1;
+  var tuning="standard", capo=0;
+
+  // ---------- demo riffs (all generic / non-copyrighted patterns) ----------
+  var RIFFS=[
+    {name:"Em Pentatonic Lick", desc:"lead phrase · standard", tuning:"standard",
+     seq:"E3 G3 A3 B3 D4 B3 A3 G3 E3"},
+    {name:"A Blues Shuffle", desc:"boogie bassline · standard", tuning:"standard",
+     seq:"A2 A2 E3 A2 F#3 A2 E3 A2 G3 A2 E3 A2"},
+    {name:"Chromatic Warm-up", desc:"finger builder · standard", tuning:"standard",
+     seq:"E2 F2 F#2 G2 G#2 A2 A#2 B2 C3 C#3 D3 D#3"},
+    {name:"A Major Scale", desc:"one octave · standard", tuning:"standard",
+     seq:"A2 B2 C#3 D3 E3 F#3 G#3 A3"},
+    {name:"Drop-D Chug Riff", desc:"single-note groove · drop D", tuning:"dropd",
+     seq:"D2 D2 D2 F2 D2 G2 D2 D2 F2 E2 D2 C2"}
+  ];
+
+  function buildNotes(seq){
+    var toks=seq.trim().split(/[\s,]+/).filter(Boolean);
+    var notes=[], t=0, DUR=0.34, bad=[];
+    toks.forEach(function(tk){
+      var m=noteToMidi(tk);
+      if(m==null){bad.push(tk);return;}
+      notes.push({pitch:m,start:t,dur:DUR}); t+=DUR;
+    });
+    return {notes:notes,bad:bad};
+  }
+
+  // ---------- rendering ----------
+  var tabEl=document.getElementById("tab");
+  var tabScroll=document.getElementById("tabScroll");
+  var emptyEl=document.getElementById("empty");
+  var stageTitle=document.getElementById("stageTitle");
+  var stageMeta=document.getElementById("stageMeta");
+
+  function renderTab(){
+    tabEl.innerHTML="";
+    if(!current||!current.notes.length) return;
+    var lbl=TUNINGS[tuning].lbl, n=current.notes;
+    // rows top->bottom = high string (5) -> low (0)
+    for(var r=0;r<6;r++){
+      var sIdx=5-r;
+      var line=document.createElement("div"); line.className="tabline";
+      var l=document.createElement("span"); l.className="lbl"; l.textContent=lbl[sIdx]; line.appendChild(l);
+      var track=document.createElement("div"); track.className="track";
+      n.forEach(function(note,j){
+        var c=document.createElement("span"); c.className="cell"; c.dataset.col=j;
+        if(note.string===sIdx){ c.textContent=note.fret; c.classList.add("fret"); }
+        else c.textContent="·";
+        track.appendChild(c);
+      });
+      line.appendChild(track); tabEl.appendChild(line);
+    }
+    highlight(activeIdx);
+  }
+  function highlight(idx){
+    tabEl.querySelectorAll(".cell").forEach(function(c){
+      c.classList.toggle("is-on", +c.dataset.col===idx);
+    });
+  }
+
+  // fretboard canvas
+  var fb=document.getElementById("fb"), fctx=fb.getContext("2d");
+  function css(v){ return getComputedStyle(root).getPropertyValue(v).trim(); }
+  function draw(idx){
+    var dpr=Math.min(window.devicePixelRatio||1,2);
+    var W=fb.clientWidth||900, H=168;
+    fb.width=W*dpr; fb.height=H*dpr; fctx.setTransform(dpr,0,0,dpr,0,0);
+    fctx.clearRect(0,0,W,H);
+    var padL=34, padR=16, padT=20, padB=18;
+    var frets=13;
+    var x0=padL, x1=W-padR, y0=padT, y1=H-padB;
+    var fw=(x1-x0)/frets;
+    var sTxt=css("--muted"), sLine=css("--string"), acc=css("--accent"), acc2=css("--accent-2"), txt=css("--text");
+    fctx.font="10px "+css("--mono")+",monospace";
+    // nut
+    fctx.strokeStyle=sLine; fctx.lineWidth=1;
+    // fret lines
+    for(var f=0;f<=frets;f++){
+      var x=x0+f*fw;
+      fctx.beginPath(); fctx.moveTo(x,y0); fctx.lineTo(x,y1);
+      fctx.lineWidth=(f===0)?3:1; fctx.strokeStyle=(f===0)?txt:sLine; fctx.stroke();
+      if(f>0){ fctx.fillStyle=sTxt; fctx.textAlign="center"; fctx.fillText(f, x-fw/2, y1+13); }
+    }
+    // inlays
+    [3,5,7,9].forEach(function(f){ fctx.fillStyle=sLine; fctx.beginPath(); fctx.arc(x0+(f-0.5)*fw,(y0+y1)/2,3,0,6.29); fctx.fill(); });
+    fctx.beginPath(); fctx.arc(x0+(12-0.5)*fw,(y0+y1)/2-8,3,0,6.29); fctx.arc(x0+(12-0.5)*fw,(y0+y1)/2+8,3,0,6.29); fctx.fillStyle=sLine; fctx.fill();
+    // strings (top=high e = string5)
+    var lbl=TUNINGS[tuning].lbl;
+    var sy=[];
+    for(var r=0;r<6;r++){
+      var y=y0+r*((y1-y0)/5); sy[5-r]=y;
+      fctx.beginPath(); fctx.moveTo(x0,y); fctx.lineTo(x1,y);
+      fctx.lineWidth=0.6+r*0.18; fctx.strokeStyle=sLine; fctx.stroke();
+      fctx.fillStyle=sTxt; fctx.textAlign="right"; fctx.fillText(lbl[5-r], x0-8, y+3);
+    }
+    if(!current) return;
+    // all notes faint, active bright
+    current.notes.forEach(function(nt,j){
+      var f=nt.fret; if(f>frets) return;
+      var cx=(f===0)?x0-0: x0+(f-0.5)*fw;
+      if(f===0) cx=x0+6;
+      var cy=sy[nt.string];
+      var on=(j===idx);
+      fctx.beginPath(); fctx.arc(cx,cy, on?9:6, 0,6.29);
+      fctx.fillStyle= on?acc : acc2;
+      fctx.globalAlpha= on?1:0.28; fctx.fill(); fctx.globalAlpha=1;
+      if(on){
+        fctx.fillStyle="#1a1206"; fctx.textAlign="center"; fctx.font="bold 10px "+css("--mono")+",monospace";
+        fctx.fillText(f, cx, cy+3.5);
+        fctx.font="10px "+css("--mono")+",monospace";
+      }
+    });
+  }
+
+  // highlight helper adds .is-on background
+  var style=document.createElement("style");
+  style.textContent=".cell.is-on{background:color-mix(in srgb,var(--accent) 16%,transparent)}.cell.is-on.fret{background:color-mix(in srgb,var(--accent) 26%,transparent);color:var(--accent)}";
+  document.head.appendChild(style);
+
+  // ---------- load a sequence ----------
+  var playBtn=document.getElementById("play");
+  function load(seq,title){
+    stop();
+    var b=buildNotes(seq);
+    if(!b.notes.length){ return; }
+    current=assignTab(b.notes,tuning,capo);
+    activeIdx=-1;
+    emptyEl.hidden=true; tabScroll.hidden=false;
+    stageTitle.textContent=title||"Tablature";
+    var dropTxt=current.dropped?(" · "+current.dropped+" note(s) out of range dropped"):"";
+    stageMeta.textContent=current.notes.length+" notes · "+TUNINGS[tuning].lbl.join("")+(capo?(" · capo "+capo):"")+dropTxt;
+    playBtn.disabled=false;
+    renderTab(); draw(-1);
+  }
+
+  // ---------- load a tab returned by the backend (real transcription) ----------
+  function loadServer(tabData,title){
+    stop();
+    var tn=(tabData.tuning&&TUNINGS[tabData.tuning])?tabData.tuning:"standard";
+    tuning=tn; document.getElementById("tuning").value=tuning; capo=0;
+    document.getElementById("capoVal").textContent="No capo";
+    var open=TUNINGS[tuning].open;
+    var notes=(tabData.notes||[]).map(function(n){
+      return {string:n.string,fret:n.fret,start:n.start,dur:n.dur,pitch:open[n.string]+n.fret};
+    });
+    current={notes:notes,dropped:0};
+    activeIdx=-1;
+    if(!notes.length){ emptyEl.hidden=false; tabScroll.hidden=true; playBtn.disabled=true; draw(-1); return; }
+    emptyEl.hidden=true; tabScroll.hidden=false;
+    stageTitle.textContent=title||"Transcribed";
+    var t=tabData.tempo_bpm?(" · ~"+Math.round(tabData.tempo_bpm)+" bpm"):"";
+    stageMeta.textContent=notes.length+" notes · "+TUNINGS[tuning].lbl.join("")+t;
+    playBtn.disabled=false;
+    renderTab(); draw(-1);
+  }
+
+  // ---------- playback (Web Audio) ----------
+  var actx=null, playing=false, raf=null, startT=0, lastNote=-1, speed=1, loop=false;
+  function ensureCtx(){ if(!actx) actx=new (window.AudioContext||window.webkitAudioContext)(); }
+  function tone(pitch,dur){
+    if(!actx) return;
+    var t=actx.currentTime, freq=440*Math.pow(2,(pitch-69)/12);
+    var o=actx.createOscillator(), g=actx.createGain();
+    o.type="triangle"; o.frequency.value=freq;
+    var o2=actx.createOscillator(), g2=actx.createGain();
+    o2.type="sawtooth"; o2.frequency.value=freq; g2.gain.value=0.18;
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.5,t+0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+Math.max(dur,0.12));
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(actx.destination);
+    o.start(t); o2.start(t); o.stop(t+dur+0.05); o2.stop(t+dur+0.05);
+  }
+  function total(){ if(!current||!current.notes.length) return 0; var l=current.notes[current.notes.length-1]; return l.start+l.dur; }
+  function tick(){
+    if(!playing) return;
+    var real=(performance.now()-startT)/1000, elapsed=real*speed, tot=total();
+    if(elapsed>=tot){
+      if(loop){ startT=performance.now(); lastNote=-1; raf=requestAnimationFrame(tick); return; }
+      stop(); return;
+    }
+    var i=-1, N=current.notes;
+    for(var k=0;k<N.length;k++){ if(elapsed>=N[k].start&&elapsed<N[k].start+N[k].dur){ i=k; break; } }
+    if(i!==lastNote && i>=0){
+      lastNote=i; activeIdx=i;
+      tone(N[i].pitch, N[i].dur/speed);
+      highlight(i); draw(i);
+      ensureVisible(i);
+    }
+    raf=requestAnimationFrame(tick);
+  }
+  function ensureVisible(i){
+    var cell=tabEl.querySelector('.cell[data-col="'+i+'"]');
+    if(cell){ var host=tabScroll; var cl=cell.getBoundingClientRect(), hl=host.getBoundingClientRect();
+      if(cl.right>hl.right-20||cl.left<hl.left+20) host.scrollLeft+=(cl.left-hl.left)-host.clientWidth/2; }
+  }
+  function play(){
+    if(!current||!current.notes.length) return;
+    ensureCtx(); if(actx.state==="suspended") actx.resume();
+    playing=true; playBtn.textContent="❚❚"; playBtn.setAttribute("aria-label","Pause");
+    startT=performance.now(); lastNote=-1;
+    raf=requestAnimationFrame(tick);
+  }
+  function pause(){ playing=false; if(raf) cancelAnimationFrame(raf); playBtn.textContent="▶"; playBtn.setAttribute("aria-label","Play"); }
+  function stop(){ pause(); activeIdx=-1; lastNote=-1; highlight(-1); draw(-1); }
+  playBtn.addEventListener("click",function(){ playing?pause():play(); });
+
+  // ---------- controls ----------
+  document.getElementById("speed").addEventListener("input",function(e){
+    speed=+e.target.value; document.getElementById("speedVal").textContent=speed.toFixed(1)+"×";
+  });
+  var loopBtn=document.getElementById("loop");
+  loopBtn.addEventListener("click",function(){ loop=!loop; loopBtn.setAttribute("aria-pressed",loop); });
+
+  document.getElementById("tuning").addEventListener("change",function(e){
+    tuning=e.target.value; if(current&&current.notes.length){ reassign(); }
+    draw(activeIdx);
+  });
+  function reassign(){
+    // rebuild from current pitches
+    var pitches=current.notes.map(function(n){return {pitch:n.pitch,start:n.start,dur:n.dur};});
+    current=assignTab(pitches,tuning,capo);
+    stageMeta.textContent=current.notes.length+" notes · "+TUNINGS[tuning].lbl.join("")+(capo?(" · capo "+capo):"");
+    renderTab();
+  }
+  function setCapo(v){
+    capo=Math.max(0,Math.min(7,v));
+    document.getElementById("capoVal").textContent=capo?("Fret "+capo):"No capo";
+    if(current&&current.notes.length) reassign();
+    draw(activeIdx);
+  }
+  document.getElementById("capoUp").addEventListener("click",function(){setCapo(capo+1);});
+  document.getElementById("capoDown").addEventListener("click",function(){setCapo(capo-1);});
+
+  // segmented tabs
+  var segBtns=document.querySelectorAll(".seg [role=tab]");
+  segBtns.forEach(function(b){
+    b.addEventListener("click",function(){
+      segBtns.forEach(function(x){x.setAttribute("aria-selected","false");});
+      b.setAttribute("aria-selected","true");
+      document.querySelectorAll(".panel").forEach(function(p){ p.classList.toggle("on", p.dataset.panel===b.dataset.tab); });
+    });
+  });
+
+  // riffs UI
+  var list=document.getElementById("riffList");
+  RIFFS.forEach(function(r){
+    var el=document.createElement("button"); el.className="riff"; el.type="button";
+    el.innerHTML="<b>"+r.name+"</b><small>"+r.desc+"</small>";
+    el.addEventListener("click",function(){
+      if(r.tuning&&r.tuning!==tuning){ tuning=r.tuning; document.getElementById("tuning").value=tuning; }
+      load(r.seq, r.name);
+    });
+    list.appendChild(el);
+  });
+
+  // type notes
+  document.getElementById("genNotes").addEventListener("click",function(){
+    var v=document.getElementById("noteInput").value;
+    var b=buildNotes(v), err=document.getElementById("noteErr");
+    if(!b.notes.length){ err.textContent="No valid notes found. Use names like E2, A#3, Db4."; return; }
+    err.textContent=b.bad.length?("Skipped unrecognized: "+b.bad.join(", ")):"";
+    load(v,"Your notes");
+  });
+
+  // upload — real transcription via the local backend
+  var drop=document.getElementById("drop"), file=document.getElementById("file");
+  drop.addEventListener("click",function(){file.click();});
+  file.addEventListener("change",function(){
+    if(!(file.files&&file.files[0])) return;
+    var f=file.files[0], msg=document.getElementById("uploadMsg"), title="Transcribed: "+f.name;
+    msg.innerHTML="⏳ Transcribing <b>"+f.name+"</b>… first run downloads the model, so give it a moment.";
+    var fd=new FormData(); fd.append("file",f);
+    fetch("/transcribe",{method:"POST",body:fd})
+      .then(function(r){ if(!r.ok) throw new Error("upload failed ("+r.status+")"); return r.json(); })
+      .then(function(j){ pollJob(j.job_id,msg,title); })
+      .catch(function(e){ msg.innerHTML="⚠️ "+e.message+" — is the riffscribe server running?"; });
+  });
+  function pollJob(id,msg,title){
+    fetch("/job/"+id).then(function(r){return r.json();}).then(function(j){
+      if(j.status==="queued"||j.status==="processing"){ msg.innerHTML="⏳ Transcribing… ("+j.status+")"; setTimeout(function(){pollJob(id,msg,title);},1000); return; }
+      if(j.status==="error"){ msg.innerHTML="⚠️ "+(j.error||"transcription failed"); return; }
+      if(j.tab){ loadServer(j.tab,title); msg.innerHTML="✅ Done — "+((j.meta&&j.meta.num_notes!=null)?j.meta.num_notes:"?")+" notes. Scroll to the tab and press ▶ to hear it."; }
+    }).catch(function(e){ msg.innerHTML="⚠️ "+e.message; });
+  }
+
+  // resize redraw
+  window.addEventListener("resize",function(){ draw(activeIdx); });
+  // initial fretboard
+  draw(-1);
+})();
+</script>
+
+</body>
+</html>
