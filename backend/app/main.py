@@ -47,6 +47,7 @@ class Job:
     id: str
     status: JobStatus = JobStatus.queued
     ascii_tab: str | None = None
+    tab: dict | None = None          # structured tab for the interactive viewer
     error: str | None = None
     meta: dict = field(default_factory=dict)
 
