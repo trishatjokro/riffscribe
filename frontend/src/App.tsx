@@ -37,9 +37,15 @@ export default function App() {
 
       {job?.status === "error" && <p style={{ color: "crimson" }}>Error: {job.error}</p>}
       {job?.status === "done" && (
-        <pre style={{ background: "#111", color: "#eee", padding: "1rem", overflowX: "auto" }}>
-          {job.ascii_tab}
-        </pre>
+        <>
+          <p style={{ color: "#888", fontSize: ".85rem" }}>
+            {String(job.meta.num_notes ?? "?")} notes
+            {job.meta.tempo_bpm ? ` · ~${Math.round(Number(job.meta.tempo_bpm))} bpm` : ""}
+          </p>
+          <pre style={{ background: "#111", color: "#eee", padding: "1rem", overflowX: "auto" }}>
+            {job.ascii_tab}
+          </pre>
+        </>
       )}
     </main>
   );
