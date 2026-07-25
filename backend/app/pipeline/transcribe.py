@@ -83,6 +83,21 @@ def _transcribe_basic_pitch(audio_path: Path) -> NoteEvents:
     )
 
 
+def _ensure_scipy_compat() -> None:
+    """Shim `scipy.signal.gaussian`, which Basic Pitch calls but SciPy removed.
+
+    It was deprecated for years and dropped in SciPy 1.13 (now
+    `scipy.signal.windows.gaussian`). Alias it back so Basic Pitch's pitch-bend
+    post-processing runs against modern SciPy without pinning an old version.
+    """
+    import scipy.signal
+
+    if not hasattr(scipy.signal, "gaussian"):
+        from scipy.signal.windows import gaussian
+
+        scipy.signal.gaussian = gaussian
+
+
 def _model_path(default):
     """Prefer the ONNX serialization of the Basic Pitch model when present.
 
