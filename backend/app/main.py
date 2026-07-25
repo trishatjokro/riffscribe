@@ -143,6 +143,7 @@ def get_job(job_id: str) -> dict:
         "job_id": job.id,
         "status": job.status,
         "ascii_tab": job.ascii_tab,
+        "tab": job.tab,
         "error": job.error,
         "meta": job.meta,
     }
