@@ -54,7 +54,7 @@ def _transcribe_basic_pitch(audio_path: Path) -> NoteEvents:
 
     _model_out, _midi, note_events = predict(
         str(audio_path),
-        ICASSP_2022_MODEL_PATH,
+        _model_path(ICASSP_2022_MODEL_PATH),
         onset_threshold=0.5,
         frame_threshold=0.3,
         minimum_note_length=70.0,          # ms — drop blips shorter than a fast note
