@@ -57,6 +57,33 @@ class Job:
 _JOBS: dict[str, Job] = {}
 
 
+# Map a tuning's open strings back to the name the web UI understands.
+_TUNING_NAMES = {
+    (40, 45, 50, 55, 59, 64): "standard",
+    (38, 45, 50, 55, 59, 64): "dropd",
+    (39, 44, 49, 54, 58, 63): "eb",
+    (38, 45, 50, 55, 57, 62): "dadgad",
+}
+
+
+def _serialize_tab(tab) -> dict:
+    """Flatten a Tablature into JSON the interactive viewer can render + play."""
+    return {
+        "tuning": _TUNING_NAMES.get(tuple(tab.tuning.open_strings), "standard"),
+        "tempo_bpm": tab.tempo_bpm,
+        "capo": tab.capo,
+        "notes": [
+            {
+                "string": n.string,
+                "fret": n.fret,
+                "start": round(n.start, 4),
+                "dur": round(n.duration, 4),
+            }
+            for n in tab.notes
+        ],
+    }
+
+
 def _run_pipeline(job_id: str, audio_path: Path) -> None:
     """Execute the transcription pipeline for a job and record the result."""
     from .pipeline.transcribe import transcribe
