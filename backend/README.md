@@ -33,9 +33,34 @@ riffscribe path/to/riff.wav
 | Stage | Module | Status |
 |---|---|---|
 | Source separation (optional) | `separate.py` | stub (P2) |
-| Audio → notes | `transcribe.py` | stub (P0) — Basic Pitch / CREPE |
+| Audio → notes | `transcribe.py` | **implemented** (Basic Pitch → monophonic) |
 | Notes → string+fret | `tab.py` | **implemented** (DP fret optimizer) |
 | Export (ASCII / .gp5 / MusicXML) | `export.py` | ASCII done; .gp5/MusicXML stub (P0) |
+
+## End-to-end: transcribe real audio
+
+The transcription stage needs the ML runtime, which is **not** installed by the
+light dev install. Add it:
+
+```bash
+pip install basic-pitch
+# Apple Silicon: a lighter runtime avoids full TensorFlow —
+#   pip install "basic-pitch[coreml]"   # or  "basic-pitch[onnx]"
+```
+
+Then transcribe a clip end-to-end (audio → notes → tab):
+
+```bash
+riffscribe path/to/riff.wav          # prints ASCII tab
+# or via the API:
+uvicorn app.main:app --reload
+curl -F "file=@path/to/riff.wav" localhost:8000/transcribe   # -> {"job_id": ...}
+curl localhost:8000/job/<job_id>                             # poll for the tab
+```
+
+The first run downloads the Basic Pitch model (~a few MB) and is slow to warm up.
+Use a clean, mostly-solo guitar clip — accuracy drops on distortion and full mixes
+(see `docs/architecture.md`).
 
 ## Tests
 
