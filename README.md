@@ -1,4 +1,4 @@
-# 🎸 riffscribe
+# 🎸 Riffscribe
 
 **Turn any guitar recording into an editable, playable tab — an open-source, electric-first automated transcriber.**
 
