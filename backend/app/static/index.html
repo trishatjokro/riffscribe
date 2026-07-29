@@ -4,42 +4,47 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>riffscribe</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎸</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎀</text></svg>">
 </head>
 <body>
 <style>
   :root{
-    /* light theme (base) */
-    --bg:#F6F1E7; --surface:#FFFFFF; --surface-2:#EFE8DA;
-    --text:#211C14; --muted:#6E6656; --border:#E3DBCB;
-    --accent:#B4651F; --accent-glow:#D8842B; --accent-2:#347368;
-    --good:#3F8F5B; --warn:#B67B22; --bad:#B4472F;
-    --string:#C4BBA8; --shadow:0 1px 2px rgba(30,22,10,.06),0 8px 24px rgba(30,22,10,.06);
+    /* coquette — light (blush cream) */
+    --bg:#FFF4F8; --surface:#FFFFFF; --surface-2:#FCE7EF;
+    --text:#5A2A3E; --muted:#B37E93; --border:#F6D6E2;
+    --accent:#E2699B; --accent-glow:#F58FB6; --accent-2:#C58BC0;
+    --good:#5AA37E; --warn:#CE7FA0; --bad:#D75C7E;
+    --string:#D8A9BE; --on-accent:#FFFFFF;
+    --shadow:0 1px 2px rgba(150,60,100,.08),0 10px 26px rgba(200,90,140,.12);
     --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --display:'Didot','Bodoni 72','Playfair Display',Georgia,'Times New Roman',serif;
     --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
   }
   @media (prefers-color-scheme:dark){
     :root{
-      --bg:#16130E; --surface:#201B14; --surface-2:#2A241B;
-      --text:#F1EADC; --muted:#A89C85; --border:#33291E;
-      --accent:#F0A339; --accent-glow:#FFB347; --accent-2:#6FB3A8;
-      --good:#5FB27C; --warn:#E8A33D; --bad:#E1725A;
-      --string:#57503F; --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);
+      --bg:#28131C; --surface:#341A25; --surface-2:#402334;
+      --text:#FBE7EF; --muted:#CB9DB1; --border:#4B2839;
+      --accent:#FF92B6; --accent-glow:#FFB4D0; --accent-2:#DFA0CC;
+      --good:#77C193; --warn:#E6A2BC; --bad:#F0879E;
+      --string:#61404F; --on-accent:#3A1622;
+      --shadow:0 1px 2px rgba(0,0,0,.45),0 12px 32px rgba(0,0,0,.4);
     }
   }
   :root[data-theme="light"]{
-    --bg:#F6F1E7; --surface:#FFFFFF; --surface-2:#EFE8DA;
-    --text:#211C14; --muted:#6E6656; --border:#E3DBCB;
-    --accent:#B4651F; --accent-glow:#D8842B; --accent-2:#347368;
-    --good:#3F8F5B; --warn:#B67B22; --bad:#B4472F;
-    --string:#C4BBA8; --shadow:0 1px 2px rgba(30,22,10,.06),0 8px 24px rgba(30,22,10,.06);
+    --bg:#FFF4F8; --surface:#FFFFFF; --surface-2:#FCE7EF;
+    --text:#5A2A3E; --muted:#B37E93; --border:#F6D6E2;
+    --accent:#E2699B; --accent-glow:#F58FB6; --accent-2:#C58BC0;
+    --good:#5AA37E; --warn:#CE7FA0; --bad:#D75C7E;
+    --string:#D8A9BE; --on-accent:#FFFFFF;
+    --shadow:0 1px 2px rgba(150,60,100,.08),0 10px 26px rgba(200,90,140,.12);
   }
   :root[data-theme="dark"]{
-    --bg:#16130E; --surface:#201B14; --surface-2:#2A241B;
-    --text:#F1EADC; --muted:#A89C85; --border:#33291E;
-    --accent:#F0A339; --accent-glow:#FFB347; --accent-2:#6FB3A8;
-    --good:#5FB27C; --warn:#E8A33D; --bad:#E1725A;
-    --string:#57503F; --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);
+    --bg:#28131C; --surface:#341A25; --surface-2:#402334;
+    --text:#FBE7EF; --muted:#CB9DB1; --border:#4B2839;
+    --accent:#FF92B6; --accent-glow:#FFB4D0; --accent-2:#DFA0CC;
+    --good:#77C193; --warn:#E6A2BC; --bad:#F0879E;
+    --string:#61404F; --on-accent:#3A1622;
+    --shadow:0 1px 2px rgba(0,0,0,.45),0 12px 32px rgba(0,0,0,.4);
   }
 
   *{box-sizing:border-box}
@@ -56,12 +61,12 @@
   header.hd{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:28px}
   .brand{display:flex;align-items:center;gap:12px}
   .mark{
-    width:40px;height:40px;border-radius:10px;flex:none;
-    background:radial-gradient(120% 120% at 30% 20%,var(--accent-glow),var(--accent) 55%,#7a3f12 130%);
-    box-shadow:0 0 0 1px rgba(0,0,0,.15) inset,0 6px 18px -6px var(--accent);
-    display:grid;place-items:center;color:#1a1206;font-size:20px;
+    width:42px;height:42px;border-radius:14px;flex:none;
+    background:radial-gradient(120% 120% at 30% 20%,var(--accent-glow),var(--accent) 55%,#B23167 130%);
+    box-shadow:0 0 0 1px rgba(255,255,255,.25) inset,0 6px 18px -6px var(--accent);
+    display:grid;place-items:center;color:var(--on-accent);font-size:20px;
   }
-  h1{font-size:clamp(1.5rem,4vw,2rem);margin:0;letter-spacing:-.02em;font-weight:750}
+  h1{font-family:var(--display);font-size:clamp(1.7rem,4.5vw,2.3rem);margin:0;letter-spacing:.01em;font-weight:600;font-style:italic}
   h1 b{color:var(--accent)}
   .tag{color:var(--muted);font-size:.86rem;margin:2px 0 0}
   .themebtn{
@@ -96,6 +101,9 @@
   }
   .seg button[aria-selected=true]{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
   .seg button:hover{color:var(--text)}
+  .seg button.disabled{opacity:.55}
+  .seg button .soon{font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--warn);padding:1px 5px;border-radius:4px;margin-left:6px}
+  input:disabled{opacity:.5;cursor:not-allowed}
 
   .panel{display:none}
   .panel.on{display:block}
@@ -117,7 +125,7 @@
 
   .btn{
     font:inherit;font-weight:650;cursor:pointer;border-radius:10px;padding:10px 18px;border:1px solid transparent;
-    background:var(--accent);color:#1a1206;transition:filter .15s,transform .05s;
+    background:var(--accent);color:var(--on-accent);transition:filter .15s,transform .05s;
   }
   .btn:hover{filter:brightness(1.06)}
   .btn:active{transform:translateY(1px)}
@@ -140,7 +148,7 @@
   .transport{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface-2)}
   .play{
     width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;flex:none;
-    background:var(--accent);color:#1a1206;font-size:18px;display:grid;place-items:center;
+    background:var(--accent);color:var(--on-accent);font-size:18px;display:grid;place-items:center;
     box-shadow:0 4px 14px -4px var(--accent);transition:filter .15s,transform .05s}
   .play:hover{filter:brightness(1.06)} .play:active{transform:scale(.95)}
   .play:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
@@ -200,7 +208,7 @@
         <div class="mark" aria-hidden="true">🎸</div>
         <div>
           <h1>riff<b>scribe</b></h1>
-          <p class="tag">Turn a guitar line into a tab you can see, hear, and edit.</p>
+          <p class="tag">Turn a guitar line into a tab you can see, hear, and edit. 🎀</p>
         </div>
       </div>
       <button class="themebtn" id="theme" type="button"><span id="themeIcon">◐</span> Theme</button>
@@ -232,7 +240,7 @@
         <button role="tab" aria-selected="true"  data-tab="riffs">Demo riffs</button>
         <button role="tab" aria-selected="false" data-tab="notes">Type notes</button>
         <button role="tab" aria-selected="false" data-tab="upload">Upload audio</button>
-        <button role="tab" aria-selected="false" data-tab="song">Song name</button>
+        <button role="tab" aria-selected="false" data-tab="song" class="disabled">Song name <span class="soon">soon</span></button>
       </div>
 
       <div class="panel on" data-panel="riffs">
@@ -264,11 +272,11 @@
       <div class="panel" data-panel="song">
         <div class="field" style="width:100%">
           <label class="lab" for="songInput">Song title</label>
-          <input type="text" id="songInput" placeholder="e.g. Smoke on the Water">
+          <input type="text" id="songInput" placeholder="Coming soon — use Upload audio instead" disabled>
         </div>
         <div class="notice">
           <span class="ic" aria-hidden="true">▲</span>
-          <div>Searching by title is a catalog/licensing feature — the big tab libraries are human-made, so this path resolves a title to audio you provide, then runs the same engine. Not enabled in this demo. <b>Upload or type notes to try the engine now.</b></div>
+          <div><b>A title alone isn't enough.</b> riffscribe listens to audio — it doesn't look tabs up in a library. Matching a song title to a recording is a licensing/catalog feature that isn't built yet. To tab a real song now, switch to <b>Upload audio</b> and drop its audio file.</div>
         </div>
       </div>
     </section>
@@ -505,7 +513,7 @@
       fctx.fillStyle= on?acc : acc2;
       fctx.globalAlpha= on?1:0.28; fctx.fill(); fctx.globalAlpha=1;
       if(on){
-        fctx.fillStyle="#1a1206"; fctx.textAlign="center"; fctx.font="bold 10px "+css("--mono")+",monospace";
+        fctx.fillStyle=css("--on-accent"); fctx.textAlign="center"; fctx.font="bold 10px "+css("--mono")+",monospace";
         fctx.fillText(f, cx, cy+3.5);
         fctx.font="10px "+css("--mono")+",monospace";
       }
