@@ -1,6 +1,6 @@
 # 🎸 riffscribe
 
-**Turn any guitar recording into an editable, playable tab — an open-source, electric-first automated transcriber.**
+**Turn any guitar recording into an editable, playable tab. An open-source, electric-first automated transcriber.**
 
 Upload a riff (or point at a song), and riffscribe generates guitar tablature you can
 play back in sync, slow down, loop, and fix in seconds. It's built for players who
