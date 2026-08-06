@@ -16,9 +16,9 @@ def main() -> None:
     parser.add_argument("--capo", type=int, default=0)
     args = parser.parse_args()
 
-    from .pipeline.transcribe import transcribe
-    from .pipeline.tab import assign_tab
     from .pipeline.export import to_ascii
+    from .pipeline.tab import assign_tab
+    from .pipeline.transcribe import transcribe
 
     events = transcribe(args.audio, backend=args.backend)
     tab = assign_tab(events, capo=args.capo)
