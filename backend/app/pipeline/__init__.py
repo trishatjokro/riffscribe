@@ -6,7 +6,7 @@ guitar line; polyphony and technique detection are out of scope (see
 docs/architecture.md).
 """
 
-from .types import Note, NoteEvents, TabNote, Tablature, Tuning, STANDARD_TUNING
+from .types import STANDARD_TUNING, Note, NoteEvents, Tablature, TabNote, Tuning
 
 __all__ = [
     "Note",
