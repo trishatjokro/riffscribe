@@ -86,9 +86,9 @@ def _serialize_tab(tab) -> dict:
 
 def _run_pipeline(job_id: str, audio_path: Path) -> None:
     """Execute the transcription pipeline for a job and record the result."""
-    from .pipeline.transcribe import transcribe
-    from .pipeline.tab import assign_tab
     from .pipeline.export import to_ascii
+    from .pipeline.tab import assign_tab
+    from .pipeline.transcribe import transcribe
 
     job = _JOBS[job_id]
     job.status = JobStatus.processing
