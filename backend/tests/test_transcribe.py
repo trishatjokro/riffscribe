@@ -5,8 +5,8 @@ manually / in integration. The `to_monophonic` collapse is pure logic and is
 the part most likely to have edge-case bugs, so it's unit-tested here.
 """
 
-from app.pipeline.types import Note
 from app.pipeline.transcribe import to_monophonic
+from app.pipeline.types import Note
 
 
 def _sorted(notes):
