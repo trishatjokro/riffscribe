@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-
 # Standard guitar tuning, low string (6th) to high string (1st), as MIDI note
 # numbers: E2 A2 D3 G3 B3 E4. String index 0 == low E (6th string).
 STANDARD_TUNING_MIDI = (40, 45, 50, 55, 59, 64)
