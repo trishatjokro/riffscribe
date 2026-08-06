@@ -11,7 +11,7 @@ here rather than stubbed.
 
 from __future__ import annotations
 
-from .types import Note, NoteEvents, Tablature, TabNote, Tuning, STANDARD_TUNING
+from .types import STANDARD_TUNING, Note, NoteEvents, Tablature, TabNote, Tuning
 
 # Cost weights — tunable. Higher = more strongly avoided.
 _W_FRET_HEIGHT = 0.4    # prefer lower frets (open-position playing)
