@@ -4,9 +4,9 @@ These don't need audio or ML models — they exercise the DP optimizer directly,
 so they run in CI today (before the transcription stage is implemented).
 """
 
-from app.pipeline.types import Note, NoteEvents, STANDARD_TUNING
-from app.pipeline.tab import assign_tab
 from app.pipeline.export import to_ascii
+from app.pipeline.tab import assign_tab
+from app.pipeline.types import STANDARD_TUNING, Note, NoteEvents
 
 
 def _events(pitches: list[int]) -> NoteEvents:
